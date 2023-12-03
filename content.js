@@ -63,7 +63,7 @@ const elementChanger = async (element) => {
   // After the delay, update the element's text content
   // element.textContent = 'Boilerplate text';
 
-  const prompt = document.getElementById('userPrompt').value = storedPrompt;
+  const prompt = document.getElementById('userPrompt').value;
 
   const response = await requestOpenai(element, prompt);
   element.textContent = response;
