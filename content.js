@@ -21,7 +21,7 @@ async function requestOpenai(originalText, userPrompt) {
   const data = {
     model: "gpt-3.5-turbo",
     messages: [{ role: "system", content: `Here's the original text: "${originalText}". Rewrite it according to the following user instruction: "${userPrompt}". Make sure the output is similar in length as the original text.` }],
-    max_tokens: originalText?.length * 1.5
+    // max_tokens: Number(originalText?.length * 1.5)
   };
 
   // Make an asynchronous request to the OpenAI API
@@ -29,7 +29,7 @@ async function requestOpenai(originalText, userPrompt) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer OPENAI_API_KEY`,
+      'Authorization': `Bearer OPENAI API KEY`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data)
@@ -37,7 +37,7 @@ async function requestOpenai(originalText, userPrompt) {
 
   const responseData = await response.json();
   console.log("responseData: ", responseData)
-  return responseData.choices[0]["message"]["content"];
+  return responseData?.choices[0].message?.content;
 }
 
 
