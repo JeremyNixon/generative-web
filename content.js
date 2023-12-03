@@ -20,7 +20,7 @@ async function requestOpenai(originalText, userPrompt) {
   // Construct the data to be sent to the OpenAI API
   const data = {
     model: "gpt-3.5-turbo",
-    messages: [{ role: "system", content: `Here's the original text: "${originalText}". Rewrite it according to the following user instruction: "${userPrompt}". Make sure the output is similar in length as the original text.` }],
+    messages: [{ role: "user", content: `Here's the original text: "${originalText}". Rewrite it according to the following user instruction: "${userPrompt}". Make sure the output is similar in length as the original text.` }],
     // max_tokens: Number(originalText?.length * 1.5)
   };
 
