@@ -21,7 +21,7 @@ async function requestOpenai(originalText, userPrompt) {
   const data = {
     model: "gpt-3.5-turbo",
     messages: [{ role: "system", content: `Here's the original text: "${originalText}". Rewrite it according to the following user instruction: "${userPrompt}". Make sure the output is similar in length as the original text.` }],
-    max_tokens: length(originalText) * 1.5
+    max_tokens: originalText?.length * 1.5
   };
 
   // Make an asynchronous request to the OpenAI API
@@ -29,7 +29,7 @@ async function requestOpenai(originalText, userPrompt) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer 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`,
+      'Authorization': `Bearer OPENAI_API_KEY`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data)
@@ -41,18 +41,18 @@ async function requestOpenai(originalText, userPrompt) {
 }
 
 
-async function rewriteTextNodes(node, text) {
-  if (node.nodeType === Node.TEXT_NODE) {
-    if (node.textContent.trim() !== '') {
-      const rewrittenText = await rewriteTextInShakespeareStyle(node.textContent);
-      node.textContent = rewrittenText;
-    }
-  } else {
-    for (const child of node.childNodes) {
-      await rewriteTextNodes(child); // Ensure recursive calls are awaited
-    }
-  }
-}
+// async function rewriteTextNodes(node, text) {
+//   if (node.nodeType === Node.TEXT_NODE) {
+//     if (node.textContent.trim() !== '') {
+//       const rewrittenText = await rewriteTextInShakespeareStyle(node.textContent);
+//       node.textContent = rewrittenText;
+//     }
+//   } else {
+//     for (const child of node.childNodes) {
+//       await rewriteTextNodes(child); // Ensure recursive calls are awaited
+//     }
+//   }
+// }
 
 
 
@@ -63,9 +63,10 @@ const elementChanger = async (element) => {
   // After the delay, update the element's text content
   // element.textContent = 'Boilerplate text';
 
-  const prompt = document.getElementById('userPrompt').value = storedPrompt;
+  const storedPrompt = localStorage.getItem('userPrompt');
 
-  const response = await requestOpenai(element, prompt);
+  const response = await requestOpenai(element.textContent, storedPrompt);
+  console.log("response: ", response)
   element.textContent = response;
 
 
