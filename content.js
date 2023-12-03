@@ -1,30 +1,20 @@
 function rewriteText() {
-    const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6');
-    console.log("Elements:")
-    console.log(elements)
-    elements.forEach(element => {
-      element.textContent = 'Boilerplate text';
-    });
-  }
-  
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'rewriteText') {
-      rewriteText();
-      sendResponse({status: 'Text rewritten'});
-    }
+  const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6');
+  console.log("Elements:")
+  console.log(elements)
+  elements.forEach(element => {
+    elementChanger(element);
   });
-  
-document.addEventListener('click', rewriteText);
+}
 
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//     if (request.action === "rewriteText") {
-//       const elements = document.querySelectorAll("p, h1, h2, h3, h4, h5, h6");
-//       elements.forEach(element => {
-//         element.textContent = "Boilerplate text";
-//       });
-//     }
-//   });
-  
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'rewriteText') {
+    rewriteText();
+    sendResponse({ status: 'Text rewritten' });
+  }
+});
+
+document.addEventListener('click', rewriteText);
 
 async function requestOpenai(originalText, userPrompt) {
   // Construct the data to be sent to the OpenAI API
@@ -51,7 +41,7 @@ async function requestOpenai(originalText, userPrompt) {
 }
 
 
-async function rewriteTextNodes(node) {
+async function rewriteTextNodes(node, text) {
   if (node.nodeType === Node.TEXT_NODE) {
     if (node.textContent.trim() !== '') {
       const rewrittenText = await rewriteTextInShakespeareStyle(node.textContent);
@@ -62,4 +52,24 @@ async function rewriteTextNodes(node) {
       await rewriteTextNodes(child); // Ensure recursive calls are awaited
     }
   }
+}
+
+
+
+const elementChanger = async (element) => {
+  // Simulate an API call with a delay
+
+  // setTimeout(() => {
+  // After the delay, update the element's text content
+  // element.textContent = 'Boilerplate text';
+
+  const prompt = document.getElementById('userPrompt').value = storedPrompt;
+
+  const response = await requestOpenai(element, prompt);
+  element.textContent = response;
+
+
+
+
+  // }, 2000); // Set the delay in milliseconds, e.g., 2000 milliseconds for 2 seconds
 }
