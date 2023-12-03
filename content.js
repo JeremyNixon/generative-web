@@ -1,18 +1,28 @@
 function rewriteText(prompt) {
-  const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6');
-  console.log("Elements:")
-  console.log(elements)
-  elements.forEach(element => {
-    elementChanger(element, prompt);
+  return new Promise((resolve) => {
+    const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6');
+    console.log("Elements:");
+    console.log(elements);
+
+    let promises = [];
+    elements.forEach(element => {
+      promises.push(elementChanger(element, prompt));
+    });
+
+    Promise.all(promises).then(() => resolve());
   });
 }
 
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'rewriteText') {
-    rewriteText(request.prompt);
-    sendResponse({ status: 'Text rewritten' });
+    rewriteText(request.prompt).then(() => {
+      sendResponse({ status: 'Text rewritten' });
+    });
   }
+  return true; // Indicate that the response will be sent asynchronously
 });
+
 
 document.addEventListener('click', rewriteText);
 
@@ -24,19 +34,17 @@ async function requestOpenai(originalText, userPrompt) {
     // max_tokens: Number(originalText?.length * 1.5)
   };
 
-// const fs = require('fs');
-// const apiKey = fs.readFileSync('api_key.txt', 'utf8').trim();
 
   // Make an asynchronous request to the OpenAI API
   // Note: You need to include your OpenAI API Key in the request headers
-const response = await fetch('https://api.openai.com/v1/chat/completions', {
-method: 'POST',
-headers: {
-    'Authorization': `Bearer `,
-    'Content-Type': 'application/json',
-},
-body: JSON.stringify(data)
-});
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer `,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  });
 
   const responseData = await response.json();
   console.log("responseData: ", responseData)
@@ -66,7 +74,7 @@ const elementChanger = async (element, prompt) => {
   // After the delay, update the element's text content
   // element.textContent = 'Boilerplate text';
 
-//   const storedPrompt = localStorage.getItem('userPrompt');
+  //   const storedPrompt = localStorage.getItem('userPrompt');
 
   const response = await requestOpenai(element.textContent, prompt);
   console.log("response: ", response)
